@@ -4,7 +4,7 @@
 
 #include "c_time.h"
 
-void update_time(struct t_time *l_time, unsigned old_t)
+void update_time(struct c_time *l_time, unsigned old_t)
 {
     unsigned new_t = (unsigned)time(NULL);
     unsigned delta = new_t - old_t;
@@ -35,7 +35,7 @@ void update_time(struct t_time *l_time, unsigned old_t)
     }
 }
 
-void disp_time(struct t_time time)
+void disp_time(struct c_time time)
 {
 
     if (time.day > 9)

@@ -1,7 +1,7 @@
 #ifndef C_TIME_H_ /* Include guard */
 #define C_TIME_H_
 
-struct t_time
+struct c_time
 {
     int min;
     int hour;
@@ -10,7 +10,7 @@ struct t_time
     int year;
 };
 
-void update_time(struct t_time *l_time, unsigned old_t);
-void disp_time(struct t_time time);
+void update_time(struct c_time *l_time, unsigned old_t);
+void disp_time(struct c_time time);
 
 #endif

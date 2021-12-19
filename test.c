@@ -30,7 +30,7 @@ waiting_queue *init()
     temp->next = NULL;
 }
 
-waiting_queue *addqueue_choosefuel(waiting_queue *head, float essence, char)
+waiting_queue *addqueue_choosefuel(waiting_queue *head, float essence)
 {
     waiting_queue *temp = head;
 
