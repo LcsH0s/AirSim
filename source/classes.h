@@ -5,30 +5,29 @@
 
 typedef struct
 {
-    float fuel;
+    int fuel;
     char number[8];
     char company[3];
-    struct c_time arrival;
+    c_time arrival;
 } plane;
 
 typedef struct
 {
-    plane avion;
+    plane *avion;
     struct waiting_queue *next;
 } waiting_queue;
 
 typedef struct
 {
-    char *event;
+    char event[3];
     struct event_queue *next;
 } event_queue;
 
 typedef struct
 {
-    plane avion;
-    char name[10];
+    char *name;
     char acronym[3];
-    struct company *next;
+    plane *plane_list;
 } company;
 
 #endif

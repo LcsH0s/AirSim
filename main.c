@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     char *curr_cmd;
     char *curr_arg;
 
-    struct c_time l_time = {0, 6, 1, 1, 2021};
+    c_time local_time = {0, 6, 1, 1, 2021};
     unsigned old_t = (unsigned)time(NULL);
 
     waiting_queue *takeoff_queue = (waiting_queue *)malloc(sizeof(waiting_queue));
@@ -25,18 +25,22 @@ int main(int argc, char *argv[])
     while (1)
     {
 
-        update_time(&l_time, old_t);
+        update_time(&local_time, old_t);
         old_t = (unsigned)time(NULL);
-        disp_time(l_time);
+        disp_time(local_time);
+
         printf("[admin] ► ");
         curr_cmd = get_command();
+
         if (is_exit(curr_cmd))
             break;
+
         if (is_time_warp(curr_cmd))
         {
             curr_arg = get_command();
-            printf("arg : %d\n", atoi(curr_arg));
+            increment_time(&local_time, atoi(curr_arg));
         }
+
         else if (is_clear(curr_cmd))
         {
             system("clear");
