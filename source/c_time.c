@@ -34,14 +34,42 @@ void update_time(struct c_time *l_time, unsigned old_t)
         }
     }
 }
+void increment_time(struct c_time *l_time, unsigned add)
+{
+
+    for (int i = 0; i < add; i++)
+    {
+        l_time->min += 1;
+        if (l_time->min == 60)
+        {
+            l_time->hour += 1;
+            l_time->min = 0;
+        }
+        if (l_time->hour == 24)
+        {
+            l_time->day += 1;
+            l_time->hour = 0;
+        }
+        if (l_time->day == 31)
+        {
+            l_time->day = 1;
+            l_time->month += 1;
+        }
+        if (l_time->month == 13)
+        {
+            l_time->month = 1;
+            l_time->year += 1;
+        }
+    }
+}
 
 void disp_time(struct c_time time)
 {
 
     if (time.day > 9)
-        printf("Time is : [%d", time.day);
+        printf("%s[system] ► Time is : [%d", "\x1b[34m", time.day);
     else
-        printf("Time is : [0%d", time.day);
+        printf("%s[system] ► Time is : [0%d", "\x1b[34m", time.day);
 
     if (time.month < 10)
         printf("/0%d", time.month);
@@ -60,5 +88,5 @@ void disp_time(struct c_time time)
     else
         printf(":0%d", time.min);
 
-    printf(":%d]\n", (10 + rand() % 50));
+    printf(":%d]%s\n", (10 + rand() % 50), "\x1b[0m");
 }

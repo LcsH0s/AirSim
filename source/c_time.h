@@ -10,7 +10,8 @@ struct c_time
     int year;
 };
 
-void update_time(struct c_time *l_time, unsigned old_t);
 void disp_time(struct c_time time);
+void update_time(struct c_time *l_time, unsigned old_t);
+void increment_time(struct c_time *l_time, unsigned add);
 
 #endif

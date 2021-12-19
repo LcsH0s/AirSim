@@ -1,11 +1,11 @@
 CC=gcc
 CFLAGS=-I. -Wall -finput-charset=UTF-8 -fexec-charset=UTF-8 -pedantic 
-LIBS=-lm -lncurses -lpthread
+LIBS=-lm
 
-all: main clean exec
+all: main clean 
 
 main: main.o commands time
-	$(CC) -o exe main.o commands.o time.o $(CFLAGS) $(LIBS)
+	$(CC) -o airport_simulator.exe main.o commands.o time.o $(CFLAGS) $(LIBS)
 
 commands:
 	$(CC) -o commands.o -c source/commands.c $(CFLAGS) $(LIBS)
@@ -17,6 +17,6 @@ clean:
 	rm -f *.o
 
 exec:
-	./exe
+	./airport_simulator.exe
 
 .PHONY: clean
