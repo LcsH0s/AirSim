@@ -17,10 +17,9 @@ int main(int argc, char *argv[])
     c_time local_time = {0, 6, 1, 1, 2021};
     unsigned old_t = (unsigned)time(NULL);
 
-    waiting_queue *takeoff_queue = (waiting_queue *)malloc(sizeof(waiting_queue));
-    waiting_queue *landing_queue = (waiting_queue *)malloc(sizeof(waiting_queue));
-
-    system("clear");
+    waiting_queue *takeoff_queue = malloc(sizeof(waiting_queue));
+    waiting_queue *landing_queue = malloc(sizeof(waiting_queue));
+    company **company_list = make_clist();
 
     while (1)
     {
@@ -28,6 +27,10 @@ int main(int argc, char *argv[])
         update_time(&local_time, old_t);
         old_t = (unsigned)time(NULL);
         disp_time(local_time);
+
+        plane *p = p_init(50, 111111, company_list[0], &(c_time){.min = 15, .hour = 6, .day = 1, .month = 1, .year = 2021});
+        wq_add(takeoff_queue, p);
+        disp_wq(takeoff_queue);
 
         printf("[admin] ► ");
         curr_cmd = get_command();

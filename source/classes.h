@@ -3,31 +3,42 @@
 
 #include "c_time.h"
 
-typedef struct
-{
-    int fuel;
-    char number[8];
-    char company[3];
-    c_time arrival;
-} plane;
+typedef struct company company;
+typedef struct plane plane;
+typedef struct waiting_queue waiting_queue;
+typedef struct event_queue event_queue;
 
-typedef struct
+struct company
+{
+    char **name;
+    char **acronym;
+};
+
+struct plane
+{
+    unsigned fuel;
+    unsigned number;
+    company *comp;
+    c_time *arrival;
+};
+
+struct waiting_queue
 {
     plane *avion;
-    struct waiting_queue *next;
-} waiting_queue;
+    waiting_queue *next;
+};
 
-typedef struct
+struct event_queue
 {
-    char event[3];
-    struct event_queue *next;
-} event_queue;
+    char *event;
+    event_queue *next;
+};
 
-typedef struct
-{
-    char *name;
-    char acronym[3];
-    plane *plane_list;
-} company;
+plane *p_init(unsigned fuel_level, unsigned number, company *company, c_time *arrival);
+company *c_init(char *name, char *acronym);
+company **make_clist();
+void wq_add(waiting_queue *wq, plane *p);
+void disp_wq(waiting_queue *wq);
+void eq_add();
 
 #endif

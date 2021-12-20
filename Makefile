@@ -4,14 +4,17 @@ LIBS=-lm
 
 all: main clean 
 
-main: main.o commands time
-	$(CC) -o airport_simulator.exe main.o commands.o time.o $(CFLAGS) $(LIBS)
+main: main.o commands time classes
+	$(CC) -o airport_simulator.exe main.o commands.o time.o classes.o $(CFLAGS) $(LIBS)
 
 commands:
 	$(CC) -o commands.o -c source/commands.c $(CFLAGS) $(LIBS)
 
 time:
 	$(CC) -o time.o -c source/c_time.c $(CFLAGS) $(LIBS)
+
+classes:
+	$(CC) -o classes.o -c source/classes.c $(CFLAGS) $(LIBS)
 
 clean:
 	rm -f *.o
