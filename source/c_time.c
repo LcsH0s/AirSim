@@ -90,3 +90,14 @@ void disp_time(c_time time)
 
     printf(":%d]%s\n", (10 + rand() % 50), "\x1b[0m");
 }
+
+int time_cmp(c_time a, c_time b)
+{
+    long long unsigned _a, _b;
+    _a = a.min + a.hour * 60 + a.day * 24 * 60 + a.month * 30 * 24 * 60 + a.year * 365 * 24 * 60;
+    _b = b.min + b.hour * 60 + b.day * 24 * 60 + b.month * 30 * 24 * 60 + b.year * 365 * 24 * 60;
+
+    if (_a > _b)
+        return 1;
+    return 0;
+}

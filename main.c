@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
     unsigned old_t = (unsigned)time(NULL);
 
     waiting_queue *takeoff_queue = malloc(sizeof(waiting_queue));
+    waiting_queue *landing_queue = malloc(sizeof(waiting_queue));
     company **company_list = make_clist();
 
     wq_init(takeoff_queue);
@@ -34,8 +35,10 @@ int main(int argc, char *argv[])
         curr_cmd = get_command();
 
         if (is_exit(curr_cmd))
+        {
+            printf("\x1b[34m[system] ► <Session Terminated>\x1b[0m\n");
             break;
-
+        }
         if (is_time_warp(curr_cmd))
         {
             curr_arg = get_command();
@@ -46,8 +49,25 @@ int main(int argc, char *argv[])
         {
             system("clear");
         }
+
+        else if (is_add(curr_cmd))
+        {
+            curr_arg = get_command();
+            if ((strcmp(curr_arg, "-t") == 0) | (strcmp(curr_arg, "--takeoff") == 0))
+                cmd_add(takeoff_queue);
+            else if ((strcmp(curr_arg, "-l") == 0) | (strcmp(curr_arg, "--landing") == 0))
+                cmd_add_rand_fuel(landing_queue);
+        }
+
+        else if (is_ls(curr_cmd))
+        {
+            curr_arg = get_command();
+            if ((strcmp(curr_arg, "-t") == 0) | (strcmp(curr_arg, "--takeoff") == 0))
+                disp_wq(takeoff_queue);
+            else if ((strcmp(curr_arg, "-l") == 0) | (strcmp(curr_arg, "--landing") == 0))
+                disp_wq(landing_queue);
+        }
     }
 
-    printf("\x1b[34m[system] ► <Session Terminated>\x1b[0m\n");
     return 0;
 }

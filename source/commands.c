@@ -40,3 +40,21 @@ int is_clear(const char *command)
     else
         return 0;
 }
+
+int is_add(const char *command)
+{
+    const char *cmd = "add";
+    if (strcmp(command, cmd) == 0)
+        return 1;
+    else
+        return 0;
+}
+
+int is_ls(const char *command)
+{
+    const char *cmd = "ls";
+    if (strcmp(command, cmd) == 0)
+        return 1;
+    else
+        return 0;
+}

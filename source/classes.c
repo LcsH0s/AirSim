@@ -77,12 +77,89 @@ void wq_init(waiting_queue *wq)
     fscanf(f, "%u", &fsize);
 
     fscanf(f, "%f %u %s %d %d %d %d %d", &fuel, &number, acronym, &min, &hour, &day, &month, &year);
-    wq->avion = p_init(fuel, number, get_company_by_acronym(acronym), &(c_time){.min = min, .day = day, .hour = hour, .month = month, .year = year});
+    wq->avion = p_init(fuel, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year});
     wq->next = NULL;
 
     for (int i = 1; i < fsize; i++)
     {
         fscanf(f, "%f %u %s %d %d %d %d %d", &fuel, &number, acronym, &min, &hour, &day, &month, &year);
-        wq_add(wq, p_init(fuel, number, get_company_by_acronym(acronym), &(c_time){.min = min, .day = day, .hour = hour, .month = month, .year = year}));
+        wq_add(wq, p_init(fuel, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year}));
     }
+}
+
+void cmd_add(waiting_queue *wq)
+{
+    unsigned number;
+    float fuel;
+    char acronym[10];
+    int min, hour, day, month, year;
+
+    printf("Flight number : ");
+    scanf(" %u", &number);
+    printf("Fuel level (percentage) : ");
+    scanf(" %f", &fuel);
+    printf("Acronym : ");
+    fflush(stdin);
+    scanf("%s", acronym);
+    printf("Arrival Time :\nMinute : ");
+    scanf(" %d", &min);
+    printf("Hour : ");
+    scanf(" %d", &hour);
+    printf("Day : ");
+    scanf(" %d", &day);
+    printf("Month : ");
+    scanf(" %d", &month);
+    printf("Year : ");
+    scanf(" %d", &year);
+
+    wq_add(wq, p_init(fuel, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year}));
+}
+
+void cmd_add_rand_fuel(waiting_queue *wq)
+{
+    unsigned number;
+    char acronym[10];
+    int min, hour, day, month, year;
+
+    printf("Flight number : ");
+    scanf(" %u", &number);
+    printf("Acronym : ");
+    fflush(stdin);
+    scanf("%s", acronym);
+    printf("Arrival Time :\nMinute : ");
+    scanf(" %d", &min);
+    printf("Hour : ");
+    scanf(" %d", &hour);
+    printf("Day : ");
+    scanf(" %d", &day);
+    printf("Month : ");
+    scanf(" %d", &month);
+    printf("Year : ");
+    scanf(" %d", &year);
+
+    wq_add(wq, p_init(10 + rand() % 90, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year}));
+}
+
+void wq_del(waiting_queue *wq, unsigned index)
+{
+    waiting_queue *current = wq;
+    waiting_queue *prev;
+
+    for (int i = 0; i < index; i++)
+    {
+        if (current->next == NULL)
+        {
+            printf("[ERROR] -> Index size exceeds waiting queue size\n");
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
+    prev->next = current->next;
+    free(current);
+}
+
+void wq_update(waiting_queue *wq, c_time local_time)
+{
+    // WIP
 }
