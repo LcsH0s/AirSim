@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[])
 {
-
+    srand(time(NULL));
     char *curr_cmd;
     char *curr_arg;
 
@@ -18,19 +18,17 @@ int main(int argc, char *argv[])
     unsigned old_t = (unsigned)time(NULL);
 
     waiting_queue *takeoff_queue = malloc(sizeof(waiting_queue));
-    waiting_queue *landing_queue = malloc(sizeof(waiting_queue));
     company **company_list = make_clist();
+
+    wq_init(takeoff_queue);
+    printf("\x1b[34m[system] ► Initialization sucessful!\x1b[0m\n");
+    disp_wq(takeoff_queue);
 
     while (1)
     {
-
         update_time(&local_time, old_t);
         old_t = (unsigned)time(NULL);
         disp_time(local_time);
-
-        plane *p = p_init(50, 111111, company_list[0], &(c_time){.min = 15, .hour = 6, .day = 1, .month = 1, .year = 2021});
-        wq_add(takeoff_queue, p);
-        disp_wq(takeoff_queue);
 
         printf("[admin] ► ");
         curr_cmd = get_command();
