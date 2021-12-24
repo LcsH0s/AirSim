@@ -29,27 +29,6 @@ company **make_clist()
     return company_list;
 }
 
-void wq_add(waiting_queue *wq, plane *p)
-{
-    waiting_queue *current = wq;
-    while (current->next != NULL)
-    {
-        current = current->next;
-    }
-    current->next = malloc(sizeof(waiting_queue));
-    current->next->avion = p;
-    current->next->next = NULL;
-}
-
-void disp_wq(waiting_queue *wq)
-{
-    printf("Flight Number  : %u\n", wq->avion->number);
-    if (wq->next != NULL)
-    {
-        disp_wq(wq->next);
-    }
-}
-
 company *get_company_by_acronym(char *acronym)
 {
     company **clist = make_clist();
@@ -61,9 +40,37 @@ company *get_company_by_acronym(char *acronym)
     return clist[0];
 }
 
-void wq_init(waiting_queue *wq)
+void wq_add(waiting_queue *wq, plane *p)
 {
-    FILE *f = fopen("events/init_planes.event", "r");
+    waiting_queue *current = wq;
+
+    while (current->next != NULL)
+    {
+        current = current->next;
+    }
+    current->next = malloc(sizeof(waiting_queue));
+    current->next->avion = p;
+    current->next->next = NULL;
+    current->next->prev = current;
+}
+
+void disp_wq(waiting_queue *wq)
+{
+    if (wq->avion == NULL)
+    {
+        printf("No planes in queue!\n");
+        return;
+    }
+    if (wq->next != NULL)
+    {
+        printf("Flight Number  : %u\n", wq->avion->number);
+        disp_wq(wq->next);
+    }
+}
+
+void tk_init(waiting_queue *wq)
+{
+    FILE *f = fopen("events/init_planes_tk.event", "r");
     unsigned fsize, number;
     float fuel;
     char acronym[10];
@@ -71,14 +78,42 @@ void wq_init(waiting_queue *wq)
 
     if (f == NULL)
     {
-        printf("\x1B[31m[ERROR] ► File Error: Program could not initialize due to missing 'init_planes.event' file\033[0m\n");
+        printf("\x1B[31m[ERROR] ► File Error: Program could not initialize due to missing 'init_planes_tk.event' file\033[0m\n");
         exit(-1); // must include stdlib.h
     }
-    fscanf(f, "%u", &fsize);
 
+    fscanf(f, "%u", &fsize);
     fscanf(f, "%f %u %s %d %d %d %d %d", &fuel, &number, acronym, &min, &hour, &day, &month, &year);
     wq->avion = p_init(fuel, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year});
     wq->next = NULL;
+    wq->prev = NULL;
+
+    for (int i = 1; i < fsize; i++)
+    {
+        fscanf(f, "%f %u %s %d %d %d %d %d", &fuel, &number, acronym, &min, &hour, &day, &month, &year);
+        wq_add(wq, p_init(fuel, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year}));
+    }
+}
+
+void ld_init(waiting_queue *wq)
+{
+    FILE *f = fopen("events/init_planes_ld.event", "r");
+    unsigned fsize, number;
+    float fuel;
+    char acronym[10];
+    int min, hour, day, month, year;
+
+    if (f == NULL)
+    {
+        printf("\x1B[31m[ERROR] ► File Error: Program could not initialize due to missing 'init_planes_ld.event' file\033[0m\n");
+        exit(-1); // must include stdlib.h
+    }
+
+    fscanf(f, "%u", &fsize);
+    fscanf(f, "%f %u %s %d %d %d %d %d", &fuel, &number, acronym, &min, &hour, &day, &month, &year);
+    wq->avion = p_init(fuel, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year});
+    wq->next = NULL;
+    wq->prev = NULL;
 
     for (int i = 1; i < fsize; i++)
     {
@@ -140,23 +175,72 @@ void cmd_add_rand_fuel(waiting_queue *wq)
     wq_add(wq, p_init(10 + rand() % 90, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year}));
 }
 
-void wq_del(waiting_queue *wq, unsigned index)
+waiting_queue *find_plane_by_number(waiting_queue *wq, unsigned number)
 {
-    waiting_queue *current = wq;
-    waiting_queue *prev;
+    while (wq->next != NULL)
+    {
+        if (wq->avion->number == number)
+            return wq;
+        wq = wq->next;
+    }
+    if (wq->avion->number == number)
+        return wq;
+    return NULL;
+}
 
+waiting_queue *find_plane_by_index(waiting_queue *wq, unsigned index)
+{
     for (int i = 0; i < index; i++)
     {
-        if (current->next == NULL)
+        if (wq->next == NULL)
         {
-            printf("[ERROR] -> Index size exceeds waiting queue size\n");
-            return;
+            printf("Index Error: Index exceeds waiting queue size\n");
+            return NULL;
         }
-        prev = current;
-        current = current->next;
+        wq = wq->next;
     }
-    prev->next = current->next;
-    free(current);
+    return wq;
+}
+
+void wq_del(waiting_queue *wq)
+{
+    waiting_queue *current = wq;
+    if ((current->prev == NULL) & (current->next == NULL))
+    {
+        wq->avion = NULL;
+        return;
+    }
+
+    else if (current->prev == NULL)
+    {
+        waiting_queue *to_pop = wq->next;
+        wq->avion = wq->next->avion;
+        to_pop->avion = NULL;
+        wq->next = wq->next->next;
+        if ((wq->next != NULL))
+            wq->next->prev = wq;
+        free(to_pop);
+    }
+
+    else if (current->next == NULL)
+    {
+        current->prev->next = NULL;
+        free(current);
+    }
+
+    else
+    {
+        current->next->prev = current->prev;
+        current->prev->next = current->next;
+        free(current);
+    }
+}
+
+void force_land(waiting_queue *wq)
+{
+    printf("Due to an emergency, the plane N°%d has now priority to land\n All other planes will be consequently delayed.\n", wq->avion->number);
+    printf("Plane N°%d has securly taken off\n Emergency state lifted\n", wq->avion->number);
+    wq_del(wq);
 }
 
 void wq_update(waiting_queue *wq, c_time local_time)

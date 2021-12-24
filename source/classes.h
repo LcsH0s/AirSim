@@ -27,6 +27,7 @@ struct waiting_queue
 {
     plane *avion;
     waiting_queue *next;
+    waiting_queue *prev;
 };
 
 struct event_queue
@@ -38,7 +39,7 @@ struct event_queue
 struct black_list
 {
     char *acronym;
-    black_list next;
+    black_list *next;
 };
 
 plane *
@@ -47,9 +48,14 @@ company *c_init(char *name, char *acronym);
 company **make_clist();
 void wq_add(waiting_queue *wq, plane *p);
 void disp_wq(waiting_queue *wq);
-void wq_init(waiting_queue *wq);
+void tk_init(waiting_queue *wq);
+void ld_init(waiting_queue *wq);
 void cmd_add(waiting_queue *wq);
 void cmd_add_rand_fuel(waiting_queue *wq);
+waiting_queue *find_plane_by_number(waiting_queue *wq, unsigned number);
+waiting_queue *find_plane_by_index(waiting_queue *wq, unsigned index);
+void wq_del(waiting_queue *wq);
 void wq_update(waiting_queue *wq, c_time local_time);
+void force_land(waiting_queue *wq);
 
 #endif

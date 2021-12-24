@@ -58,3 +58,24 @@ int is_ls(const char *command)
     else
         return 0;
 }
+
+int is_land(const char *command)
+{
+    const char *cmd = "land";
+    const char *cmd2 = "ld";
+    if (strcmp(command, cmd) == 0)
+        return 1;
+    else if (strcmp(command, cmd2) == 0)
+        return 1;
+    else
+        return 0;
+}
+
+int is_del(const char *command)
+{
+    const char *cmd = "del";
+    if (strcmp(command, cmd) == 0)
+        return 1;
+    else
+        return 0;
+}

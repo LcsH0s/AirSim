@@ -8,5 +8,7 @@ int is_time_warp(const char *command);
 int is_clear(const char *command);
 int is_add(const char *command);
 int is_ls(const char *command);
+int is_land(const char *command);
+int is_del(const char *command);
 
 #endif

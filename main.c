@@ -21,9 +21,12 @@ int main(int argc, char *argv[])
     waiting_queue *landing_queue = malloc(sizeof(waiting_queue));
     company **company_list = make_clist();
 
-    wq_init(takeoff_queue);
-    printf("\x1b[34m[system] ► Initialization sucessful!\x1b[0m\n");
+    tk_init(takeoff_queue);
+    ld_init(landing_queue);
+
     disp_wq(takeoff_queue);
+    disp_wq(landing_queue);
+    printf("\x1b[34m[system] ► Initialization sucessful!\x1b[0m\n");
 
     while (1)
     {
@@ -66,6 +69,78 @@ int main(int argc, char *argv[])
                 disp_wq(takeoff_queue);
             else if ((strcmp(curr_arg, "-l") == 0) | (strcmp(curr_arg, "--landing") == 0))
                 disp_wq(landing_queue);
+        }
+
+        else if (is_land(curr_cmd))
+        {
+            curr_arg = get_command();
+            if ((strcmp(curr_arg, "-n") == 0) | (strcmp(curr_arg, "--number") == 0))
+            {
+                curr_arg = get_command();
+                force_land(find_plane_by_number(landing_queue, atoi(curr_arg)));
+            }
+            if ((strcmp(curr_arg, "-i") == 0) | (strcmp(curr_arg, "--index") == 0))
+            {
+                curr_arg = get_command();
+                force_land(find_plane_by_index(landing_queue, atoi(curr_arg) - 1));
+            }
+        }
+        else if (is_del(curr_cmd))
+        {
+            curr_arg = get_command();
+            if ((strcmp(curr_arg, "-t") == 0) | (strcmp(curr_arg, "--takeoff") == 0))
+            {
+                curr_arg = get_command();
+                if ((strcmp(curr_arg, "-n") == 0) | (strcmp(curr_arg, "--number") == 0))
+                {
+                    curr_arg = get_command();
+                    if (find_plane_by_number(takeoff_queue, atoi(curr_arg)))
+                    {
+                        printf("Plane N°%d sucessfully removed from takeoff queue\n", (find_plane_by_number(takeoff_queue, atoi(curr_arg)))->avion->number);
+                        wq_del(find_plane_by_number(takeoff_queue, atoi(curr_arg)));
+                    }
+                    else
+                        printf("Value Error: Please enter a valid plane number\n");
+                }
+                if ((strcmp(curr_arg, "-i") == 0) | (strcmp(curr_arg, "--index") == 0))
+                {
+                    curr_arg = get_command();
+                    if (find_plane_by_index(takeoff_queue, atoi(curr_arg) - 1))
+                    {
+                        printf("Plane N°%d sucessfully removed from takeoff queue\n", (find_plane_by_index(takeoff_queue, atoi(curr_arg) - 1))->avion->number);
+                        wq_del(find_plane_by_index(takeoff_queue, atoi(curr_arg) - 1));
+                        printf("Successfully removed!\n");
+                    }
+                    else
+                        printf("Index Error : Please enter a valid index\n");
+                }
+            }
+            else if ((strcmp(curr_arg, "-l") == 0) | (strcmp(curr_arg, "--landing") == 0))
+            {
+                curr_arg = get_command();
+                if ((strcmp(curr_arg, "-n") == 0) | (strcmp(curr_arg, "--number") == 0))
+                {
+                    curr_arg = get_command();
+                    if (find_plane_by_number(landing_queue, atoi(curr_arg)))
+                    {
+                        printf("Plane N°%d sucessfully removed from landing queue\n", (find_plane_by_number(landing_queue, atoi(curr_arg)))->avion->number);
+                        wq_del(find_plane_by_number(landing_queue, atoi(curr_arg)));
+                    }
+                    else
+                        printf("Value Error: Please enter a valid plane number\n");
+                }
+                if ((strcmp(curr_arg, "-i") == 0) | (strcmp(curr_arg, "--index") == 0))
+                {
+                    curr_arg = get_command();
+                    if (find_plane_by_index(landing_queue, atoi(curr_arg) - 1))
+                    {
+                        printf("Plane N°%d sucessfully removed from landing queue\n", (find_plane_by_index(landing_queue, atoi(curr_arg) - 1))->avion->number);
+                        wq_del(find_plane_by_index(landing_queue, atoi(curr_arg) - 1));
+                    }
+                    else
+                        printf("Index Error : Please enter a valid index\n");
+                }
+            }
         }
     }
 
