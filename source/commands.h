@@ -10,5 +10,6 @@ int is_add(const char *command);
 int is_ls(const char *command);
 int is_land(const char *command);
 int is_del(const char *command);
+int is_info(const char *command);
 
 #endif

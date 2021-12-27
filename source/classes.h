@@ -3,6 +3,14 @@
 
 #include "c_time.h"
 
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
+#define ANSI_COLOR_RESET "\x1b[0m"
+
 typedef struct company company;
 typedef struct plane plane;
 typedef struct waiting_queue waiting_queue;
@@ -48,6 +56,9 @@ company *c_init(char *name, char *acronym);
 company **make_clist();
 void wq_add(waiting_queue *wq, plane *p);
 void disp_wq(waiting_queue *wq);
+void p_info(waiting_queue *wq);
+void info_all(waiting_queue *wq);
+
 void tk_init(waiting_queue *wq);
 void ld_init(waiting_queue *wq);
 void cmd_add(waiting_queue *wq);
@@ -55,7 +66,7 @@ void cmd_add_rand_fuel(waiting_queue *wq);
 waiting_queue *find_plane_by_number(waiting_queue *wq, unsigned number);
 waiting_queue *find_plane_by_index(waiting_queue *wq, unsigned index);
 void wq_del(waiting_queue *wq);
-void wq_update(waiting_queue *wq, c_time local_time);
+void tk_update(waiting_queue *wq, c_time local_time);
 void force_land(waiting_queue *wq);
 
 #endif

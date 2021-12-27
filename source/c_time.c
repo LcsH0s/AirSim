@@ -91,13 +91,80 @@ void disp_time(c_time time)
     printf(":%d]%s\n", (10 + rand() % 50), "\x1b[0m");
 }
 
+void str_time(c_time time)
+{
+    if (time.hour > 9)
+        printf(" %d", time.hour);
+    else
+        printf(" 0%d", time.hour);
+
+    if (time.min > 9)
+        printf(":%d", time.min);
+    else
+        printf(":0%d", time.min);
+
+    printf(":%d", (10 + rand() % 50));
+}
+
+void delay(unsigned int msecs)
+{
+    clock_t goal = msecs * CLOCKS_PER_SEC / 1000 + clock(); // convert msecs to clock count
+    while (goal > clock())
+        ;
+}
+
 int time_cmp(c_time a, c_time b)
 {
-    long long unsigned _a, _b;
-    _a = a.min + a.hour * 60 + a.day * 24 * 60 + a.month * 30 * 24 * 60 + a.year * 365 * 24 * 60;
-    _b = b.min + b.hour * 60 + b.day * 24 * 60 + b.month * 30 * 24 * 60 + b.year * 365 * 24 * 60;
-
-    if (_a > _b)
+    if (a.year > b.year)
+    {
         return 1;
-    return 0;
+    }
+    else if (a.year < b.year)
+    {
+        return 0;
+    }
+    else
+    {
+        if (a.month > b.month)
+        {
+            return 1;
+        }
+        else if (a.month < b.month)
+        {
+            return 0;
+        }
+        else
+        {
+            if (a.day > b.day)
+            {
+                return 1;
+            }
+            else if (a.day < b.day)
+            {
+                return 0;
+            }
+            else
+            {
+                if (a.hour > b.hour)
+                {
+                    return 1;
+                }
+                else if (a.hour < b.hour)
+                {
+                    return 0;
+                }
+                else
+                {
+                    if (a.min >= b.min)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+            }
+        }
+    }
 }

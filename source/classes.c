@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "classes.h"
 #include "c_time.h"
@@ -8,7 +9,12 @@
 plane *p_init(float fuel_level, unsigned number, company *comp, c_time *arrival)
 {
     plane *p = malloc(sizeof(plane *));
-    *p = (plane){.fuel = fuel_level, .number = number, .comp = comp, .arrival = arrival};
+    *p = (plane){.fuel = fuel_level, .number = number, .comp = comp, .arrival = malloc(sizeof(c_time))};
+    p->arrival->min = arrival->min;
+    p->arrival->hour = arrival->hour;
+    p->arrival->day = arrival->day;
+    p->arrival->month = arrival->month;
+    p->arrival->year = arrival->year;
     return p;
 }
 
@@ -17,6 +23,13 @@ company *c_init(char *name, char *acronym)
     company *c = malloc(sizeof(company));
     *c = (company){.name = strdup(name), .acronym = strdup(acronym)};
     return c;
+}
+
+waiting_queue *seek_head(waiting_queue *wq)
+{
+    while (wq->prev != NULL)
+        wq = wq->prev;
+    return wq;
 }
 
 company **make_clist()
@@ -40,9 +53,39 @@ company *get_company_by_acronym(char *acronym)
     return clist[0];
 }
 
+void p_info(waiting_queue *wq)
+{
+    printf("%s[info] ► Information on plane N°%d : %s", ANSI_COLOR_CYAN, wq->avion->number, ANSI_COLOR_RESET);
+    printf("%sFuel Level : %.1f Company : %s Arrival : %s", ANSI_COLOR_CYAN, wq->avion->fuel, wq->avion->comp->acronym, ANSI_COLOR_RESET);
+    str_time(*(wq->avion->arrival));
+    printf("\n");
+}
+
+void info_all(waiting_queue *wq)
+{
+    if (wq->avion == NULL)
+    {
+        printf("%sN/A %s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
+        return;
+    }
+    wq = seek_head(wq);
+    while (wq->next != NULL)
+    {
+        p_info(wq);
+        wq = wq->next;
+    }
+    p_info(wq);
+}
+
 void wq_add(waiting_queue *wq, plane *p)
 {
-    waiting_queue *current = wq;
+    waiting_queue *current = seek_head(wq);
+    wq = seek_head(wq);
+    if (wq->avion == NULL)
+    {
+        wq->avion = p;
+        return;
+    }
 
     while (current->next != NULL)
     {
@@ -56,16 +99,18 @@ void wq_add(waiting_queue *wq, plane *p)
 
 void disp_wq(waiting_queue *wq)
 {
+    wq = seek_head(wq);
     if (wq->avion == NULL)
     {
-        printf("No planes in queue!\n");
+        printf("%s[info] ► N/A%s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
         return;
     }
-    if (wq->next != NULL)
+    while (wq->next != NULL)
     {
-        printf("Flight Number  : %u\n", wq->avion->number);
-        disp_wq(wq->next);
+        printf("%s[info] ► Flight number : %d%s\n", ANSI_COLOR_CYAN, wq->avion->number, ANSI_COLOR_RESET);
+        wq = wq->next;
     }
+    printf("%s[info] ► Flight number : %d%s\n", ANSI_COLOR_CYAN, wq->avion->number, ANSI_COLOR_RESET);
 }
 
 void tk_init(waiting_queue *wq)
@@ -114,7 +159,6 @@ void ld_init(waiting_queue *wq)
     wq->avion = p_init(fuel, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year});
     wq->next = NULL;
     wq->prev = NULL;
-
     for (int i = 1; i < fsize; i++)
     {
         fscanf(f, "%f %u %s %d %d %d %d %d", &fuel, &number, acronym, &min, &hour, &day, &month, &year);
@@ -194,7 +238,7 @@ waiting_queue *find_plane_by_index(waiting_queue *wq, unsigned index)
     {
         if (wq->next == NULL)
         {
-            printf("Index Error: Index exceeds waiting queue size\n");
+            printf("%s[error] ► Index Error: Index exceeds waiting queue size%s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
             return NULL;
         }
         wq = wq->next;
@@ -238,12 +282,25 @@ void wq_del(waiting_queue *wq)
 
 void force_land(waiting_queue *wq)
 {
-    printf("Due to an emergency, the plane N°%d has now priority to land\n All other planes will be consequently delayed.\n", wq->avion->number);
-    printf("Plane N°%d has securly taken off\n Emergency state lifted\n", wq->avion->number);
+    printf("%s[system] ► Due to an emergency, the plane N°%d has now priority to land\n All other planes will be consequently delayed.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, ANSI_COLOR_RESET);
+    printf("%s[system] ► Plane N°%d has securly taken off\n Emergency state lifted%s\n", ANSI_COLOR_GREEN, wq->avion->number, ANSI_COLOR_RESET);
     wq_del(wq);
 }
 
-void wq_update(waiting_queue *wq, c_time local_time)
+void tk_update(waiting_queue *wq, c_time local_time)
 {
-    // WIP
+    wq = seek_head(wq);
+    if (wq->avion == NULL)
+        return;
+    if (time_cmp(local_time, *(wq->avion->arrival)))
+    {
+        printf("%s[info] ► Plane number N°%d has landed at ", ANSI_COLOR_CYAN, wq->avion->number);
+        str_time(*(wq->avion->arrival));
+        printf("%s\n", ANSI_COLOR_RESET);
+
+        wq_del(wq);
+        tk_update(wq, local_time);
+        if (wq->avion == NULL)
+            return;
+    }
 }

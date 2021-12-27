@@ -79,3 +79,12 @@ int is_del(const char *command)
     else
         return 0;
 }
+
+int is_info(const char *command)
+{
+    const char *cmd = "info";
+    if (strcmp(command, cmd) == 0)
+        return 1;
+    else
+        return 0;
+}

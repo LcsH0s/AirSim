@@ -21,17 +21,45 @@ int main(int argc, char *argv[])
     waiting_queue *landing_queue = malloc(sizeof(waiting_queue));
     company **company_list = make_clist();
 
+    printf("%s[system] ► Takeoff queue initializing", ANSI_COLOR_BLUE);
+    fflush(stdout);
+    delay(500);
+    printf(".");
+    fflush(stdout);
+    delay(500);
+    printf(".");
+    fflush(stdout);
+    delay(500);
+    printf(".%s", ANSI_COLOR_RESET);
+    fflush(stdout);
+    delay(500);
+    printf("\n");
     tk_init(takeoff_queue);
-    ld_init(landing_queue);
-
     disp_wq(takeoff_queue);
+
+    printf("%s[system] ► Takeoff queue initializing", ANSI_COLOR_BLUE);
+    fflush(stdout);
+    delay(500);
+    printf(".");
+    fflush(stdout);
+    delay(500);
+    printf(".");
+    fflush(stdout);
+    delay(500);
+    printf(".%s", ANSI_COLOR_RESET);
+    fflush(stdout);
+    delay(500);
+    printf("\n");
+
+    ld_init(landing_queue);
     disp_wq(landing_queue);
-    printf("\x1b[34m[system] ► Initialization sucessful!\x1b[0m\n");
+    printf("\n%s[system] ► Initialization Complete!%s\n", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
 
     while (1)
     {
         update_time(&local_time, old_t);
         old_t = (unsigned)time(NULL);
+        tk_update(takeoff_queue, local_time);
         disp_time(local_time);
 
         printf("[admin] ► ");
@@ -140,6 +168,65 @@ int main(int argc, char *argv[])
                     else
                         printf("Index Error : Please enter a valid index\n");
                 }
+            }
+        }
+        else if (is_info(curr_cmd))
+        {
+            curr_arg = get_command();
+            if ((strcmp(curr_arg, "-t") == 0) | (strcmp(curr_arg, "--takeoff") == 0))
+            {
+                curr_arg = get_command();
+                if ((strcmp(curr_arg, "-n") == 0) | (strcmp(curr_arg, "--number") == 0))
+                {
+                    curr_arg = get_command();
+                    if (find_plane_by_number(takeoff_queue, atoi(curr_arg)))
+                    {
+                        p_info(find_plane_by_number(takeoff_queue, atoi(curr_arg)));
+                    }
+                    else
+                        printf("Value Error: Please enter a valid plane number\n");
+                }
+                if ((strcmp(curr_arg, "-i") == 0) | (strcmp(curr_arg, "--index") == 0))
+                {
+                    curr_arg = get_command();
+                    if (find_plane_by_index(takeoff_queue, atoi(curr_arg) - 1))
+                    {
+                        p_info(find_plane_by_index(takeoff_queue, atoi(curr_arg) - 1));
+                    }
+                    else
+                        printf("Index Error : Please enter a valid index\n");
+                }
+            }
+            else if ((strcmp(curr_arg, "-l") == 0) | (strcmp(curr_arg, "--landing") == 0))
+            {
+                curr_arg = get_command();
+                if ((strcmp(curr_arg, "-n") == 0) | (strcmp(curr_arg, "--number") == 0))
+                {
+                    curr_arg = get_command();
+                    if (find_plane_by_number(landing_queue, atoi(curr_arg)))
+                    {
+                        p_info(find_plane_by_number(landing_queue, atoi(curr_arg)));
+                    }
+                    else
+                        printf("Value Error: Please enter a valid plane number\n");
+                }
+                if ((strcmp(curr_arg, "-i") == 0) | (strcmp(curr_arg, "--index") == 0))
+                {
+                    curr_arg = get_command();
+                    if (find_plane_by_index(landing_queue, atoi(curr_arg) - 1))
+                    {
+                        p_info(find_plane_by_index(landing_queue, atoi(curr_arg) - 1));
+                    }
+                    else
+                        printf("Index Error : Please enter a valid index\n");
+                }
+            }
+            else if ((strcmp(curr_arg, "-a") == 0) | (strcmp(curr_arg, "--all") == 0))
+            {
+                printf("%s[info] ► Takeoff queue: \n", ANSI_COLOR_MAGENTA);
+                info_all(takeoff_queue);
+                printf("%s[info] ► Landing queue:\n", ANSI_COLOR_MAGENTA);
+                info_all(landing_queue);
             }
         }
     }
