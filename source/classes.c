@@ -42,6 +42,16 @@ company **make_clist()
     return company_list;
 }
 
+company **make_bl()
+{
+    company **black_list = malloc(sizeof(company *) * 4);
+    black_list[0] = NULL;
+    black_list[1] = NULL;
+    black_list[2] = NULL;
+    black_list[3] = NULL;
+    return black_list;
+}
+
 company *get_company_by_acronym(char *acronym)
 {
     company **clist = make_clist();
@@ -55,10 +65,10 @@ company *get_company_by_acronym(char *acronym)
 
 void p_info(waiting_queue *wq)
 {
-    printf("%s[info] ► Information on plane N°%d : %s", ANSI_COLOR_CYAN, wq->avion->number, ANSI_COLOR_RESET);
-    printf("%sFuel Level : %.1f Company : %s Arrival : %s", ANSI_COLOR_CYAN, wq->avion->fuel, wq->avion->comp->acronym, ANSI_COLOR_RESET);
+    printf("%s[info] ► Information on plane N°%d : ", ANSI_COLOR_CYAN, wq->avion->number);
+    printf("%sFuel Level : %.1f Company : %s Arrival : ", ANSI_COLOR_CYAN, wq->avion->fuel, wq->avion->comp->acronym);
     str_time(*(wq->avion->arrival));
-    printf("\n");
+    printf("%s\n", ANSI_COLOR_RESET);
 }
 
 void info_all(waiting_queue *wq)
@@ -280,18 +290,94 @@ void wq_del(waiting_queue *wq)
     }
 }
 
-void force_land(waiting_queue *wq)
+void land(waiting_queue *wq)
 {
-    printf("%s[system] ► Due to an emergency, the plane N°%d has now priority to land\n All other planes will be consequently delayed.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, ANSI_COLOR_RESET);
-    printf("%s[system] ► Plane N°%d has securly taken off\n Emergency state lifted%s\n", ANSI_COLOR_GREEN, wq->avion->number, ANSI_COLOR_RESET);
+    printf("%s[system] ► Due to meteorological circumstances, plane N°%d will land as soon as the landing strip is clear.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, ANSI_COLOR_RESET);
+    printf("%s[system] ► Plane N°%d has securly landed. Resuming normal trafic.%s\n", ANSI_COLOR_GREEN, wq->avion->number, ANSI_COLOR_RESET);
     wq_del(wq);
 }
 
-void tk_update(waiting_queue *wq, c_time local_time)
+void force_land(waiting_queue *wq)
 {
-    wq = seek_head(wq);
+    printf("%s[system] ► Due to an emergency, the plane N°%d has now priority to land\n[system] ► All other planes will be consequently delayed.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, ANSI_COLOR_RESET);
+    printf("%s[system] ► Plane N°%d has securly landed\n[system] ► Emergency state lifted.%s\n", ANSI_COLOR_GREEN, wq->avion->number, ANSI_COLOR_RESET);
+    wq_del(wq);
+}
+
+int is_comp_in_bl(company *c, company **bl)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        if (bl[i] != NULL)
+        {
+            if (strcmp(bl[i]->acronym, c->acronym) == 0)
+                return 1;
+        }
+    }
+    return 0;
+}
+
+void tk_update(waiting_queue *wq, c_time local_time, company **bl)
+{
     if (wq->avion == NULL)
         return;
+    if (is_comp_in_bl(wq->avion->comp, bl))
+    {
+        printf("%s[warning] ► Plane N°%d has been removed from takeoff queue because it's company (%s) has been blacklisted.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, wq->avion->comp->name, ANSI_COLOR_RESET);
+        wq_del(wq);
+        tk_update(wq, local_time, bl);
+        if (wq->avion == NULL)
+            return;
+    }
+
+    if (wq->avion->fuel <= 20)
+    {
+        printf("%s[warning] ► Plane N°%d has been removed from takeoff queue because it has less than 20%% of it's fuel capacity.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, ANSI_COLOR_RESET);
+        wq_del(wq);
+        tk_update(wq, local_time, bl);
+        if (wq->avion == NULL)
+            return;
+    }
+
+    if (time_cmp(local_time, *(wq->avion->arrival)))
+    {
+        printf("%s[info] ► Plane number N°%d has taken off at ", ANSI_COLOR_CYAN, wq->avion->number);
+        str_time(*(wq->avion->arrival));
+        printf("%s\n", ANSI_COLOR_RESET);
+
+        wq_del(wq);
+        tk_update(wq, local_time, bl);
+        if (wq->avion == NULL)
+            return;
+    }
+    if (wq->next != NULL)
+    {
+        tk_update(wq->next, local_time, bl);
+    }
+}
+
+void ld_update(waiting_queue *wq, c_time local_time, company **bl)
+{
+    if (wq->avion == NULL)
+        return;
+    if (is_comp_in_bl(wq->avion->comp, bl))
+    {
+        printf("%s[warning] ► Plane N°%d has landed because it's company (%s) has been blacklisted.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, wq->avion->comp->name, ANSI_COLOR_RESET);
+        wq_del(wq);
+        ld_update(wq, local_time, bl);
+        if (wq->avion == NULL)
+            return;
+    }
+
+    if (wq->avion->fuel <= 20)
+    {
+        printf("%s[warning] ► Plane N°%d has landed in priority because it has less than 20%% of it's fuel capacity.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, ANSI_COLOR_RESET);
+        wq_del(wq);
+        ld_update(wq, local_time, bl);
+        if (wq->avion == NULL)
+            return;
+    }
+
     if (time_cmp(local_time, *(wq->avion->arrival)))
     {
         printf("%s[info] ► Plane number N°%d has landed at ", ANSI_COLOR_CYAN, wq->avion->number);
@@ -299,8 +385,124 @@ void tk_update(waiting_queue *wq, c_time local_time)
         printf("%s\n", ANSI_COLOR_RESET);
 
         wq_del(wq);
-        tk_update(wq, local_time);
+        ld_update(wq, local_time, bl);
         if (wq->avion == NULL)
             return;
+    }
+    if (wq->next != NULL)
+        ld_update(wq->next, local_time, bl);
+}
+
+void blacklist_add(company **bl, company *c)
+{
+    if (is_comp_in_bl(c, bl))
+    {
+        printf("%s[error] ► %s Inc. is already blacklisted.%s\n", ANSI_COLOR_RED, c->name, ANSI_COLOR_RESET);
+        return;
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (bl[i] == NULL)
+        {
+            bl[i] = c;
+            printf("%s[warning] ► %s Inc. has been blacklisted. All %s planes in takeoff queue are therefore suspended and all %s planes in landing queue will land in priority.%s\n", ANSI_COLOR_YELLOW, c->name, c->name, c->name, ANSI_COLOR_RESET);
+            return;
+        }
+    }
+}
+
+void blacklist_remove(company **bl, company *c)
+{
+    if (!is_comp_in_bl(c, bl))
+    {
+        printf("%s[error] ► %s Inc. is not currently blacklisted.%s\n", ANSI_COLOR_RED, c->name, ANSI_COLOR_RESET);
+        return;
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (strcmp(bl[i]->acronym, c->acronym) == 0)
+        {
+            bl[i] = NULL;
+            printf("%s[info] ► %s Inc. has been un-blacklisted. All %s planes can now operate normaly.%s\n", ANSI_COLOR_YELLOW, c->name, c->name, ANSI_COLOR_RESET);
+            return;
+        }
+    }
+}
+
+void disp_bl(company **bl)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        if (bl[i] != NULL)
+        {
+            printf("%s[info] ► %s Inc. is currently blacklisted%s\n", ANSI_COLOR_CYAN, bl[i]->name, ANSI_COLOR_RESET);
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        if (bl[i] != NULL)
+            return;
+    }
+    printf("%s[info] ► No company is blacklisted.%s\n", ANSI_COLOR_CYAN, ANSI_COLOR_RESET);
+}
+
+void disp_clist(company **clist)
+{
+    printf("%s[info] ► Company list:%s\n", ANSI_COLOR_CYAN, ANSI_COLOR_RESET);
+    for (int i = 0; i < 4; i++)
+    {
+        printf("%s[info] ► %s Inc. has acronym %s%s\n", ANSI_COLOR_CYAN, clist[i]->name, clist[i]->acronym, ANSI_COLOR_RESET);
+    }
+}
+
+void disp_cc(company *c, waiting_queue *tk, waiting_queue *ld)
+{
+    printf("%s[info] ► Company caracteristics:%s\n", ANSI_COLOR_CYAN, ANSI_COLOR_RESET);
+    printf("%s[info] ► Name: %s%s\n", ANSI_COLOR_CYAN, c->name, ANSI_COLOR_RESET);
+    printf("%s[info] ► Acronym: %s%s\n", ANSI_COLOR_CYAN, c->acronym, ANSI_COLOR_RESET);
+    printf("%s[info] ► Planes:%s\n", ANSI_COLOR_CYAN, ANSI_COLOR_CYAN);
+    tk = seek_head(tk);
+    ld = seek_head(ld);
+    unsigned p = 0;
+    if (tk->avion != NULL)
+    {
+        while (tk->next != NULL)
+        {
+            if (strcmp(tk->avion->comp->acronym, c->acronym) == 0)
+            {
+                printf("%s[info] ► Plane N°%d%s\n", ANSI_COLOR_CYAN, tk->avion->number, ANSI_COLOR_RESET);
+                p = 1;
+            }
+            tk = tk->next;
+        }
+        if (strcmp(tk->avion->comp->acronym, c->acronym) == 0)
+        {
+            printf("%s[info] ► Plane N°%d%s\n", ANSI_COLOR_CYAN, tk->avion->number, ANSI_COLOR_RESET);
+            p = 1;
+        }
+    }
+    if (ld->avion != NULL)
+    {
+        while (ld->next != NULL)
+        {
+            if (strcmp(ld->avion->comp->acronym, c->acronym) == 0)
+            {
+                printf("%s[info] ► Plane N°%d%s\n", ANSI_COLOR_CYAN, ld->avion->number, ANSI_COLOR_RESET);
+                p = 1;
+            }
+            ld = ld->next;
+        }
+        if (strcmp(ld->avion->comp->acronym, c->acronym) == 0)
+        {
+            printf("%s[info] ► Plane N°%d%s\n", ANSI_COLOR_CYAN, ld->avion->number, ANSI_COLOR_RESET);
+            p = 1;
+        }
+    }
+    if (!p)
+    {
+        printf("%sN/A%s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
+        return;
     }
 }

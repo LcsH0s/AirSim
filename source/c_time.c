@@ -103,7 +103,7 @@ void str_time(c_time time)
     else
         printf(":0%d", time.min);
 
-    printf(":%d", (10 + rand() % 50));
+    printf(":00");
 }
 
 void delay(unsigned int msecs)

@@ -1,0 +1,8 @@
+Mettez une compagnie sur la liste noire et donc, retirez tous les avions 
+en attente de décollage de cette compagnie, et faites atterrir 
+prioritairement les avions de cette compagnie en attente d’atterrissage. 
+Pour une compagnie donnée, affichez toutes les caractéristiques de la 
+liste de ses avions. 
+Créez un fichier aeroport_log.txt permettant la consultation de 
+l’historique d’utilisation de la piste de l’aéroport en question. 
+Vous pouvez ajouter d’autres opérations. 

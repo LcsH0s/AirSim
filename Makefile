@@ -1,11 +1,11 @@
 CC=gcc
-CFLAGS=-I. -Wall -finput-charset=UTF-8 -fexec-charset=UTF-8 -pedantic 
+CFLAGS=-I. -Wall -Wno-unknown-pragmas -finput-charset=UTF-8 -fexec-charset=UTF-8 -pedantic 
 LIBS=-lm
 
 all: main clean 
 
 main: main.o commands time classes
-	$(CC) -o airport_simulator.exe main.o commands.o time.o classes.o $(CFLAGS) $(LIBS)
+	$(CC) -o AirSim.exe main.o commands.o time.o classes.o $(CFLAGS) $(LIBS)
 
 commands:
 	$(CC) -o commands.o -c source/commands.c $(CFLAGS) $(LIBS)

@@ -88,3 +88,24 @@ int is_info(const char *command)
     else
         return 0;
 }
+
+int is_man(const char *command)
+{
+    const char *cmd = "man";
+    if (strcmp(command, cmd) == 0)
+        return 1;
+    else
+        return 0;
+}
+
+int is_bl(const char *command)
+{
+    const char *cmd = "blacklist";
+    const char *cmd2 = "bl";
+    if (strcmp(command, cmd) == 0)
+        return 1;
+    else if (strcmp(command, cmd2) == 0)
+        return 1;
+    else
+        return 0;
+}
