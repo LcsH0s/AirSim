@@ -6,8 +6,8 @@
     You can add, delete and advance in time to observe the behaviour of the scheduled flights
 
 # COMMANDS
-`    exit
-        closes the program`
+    exit
+        closes the program
     
     timewarp [n]
     tw [n]
