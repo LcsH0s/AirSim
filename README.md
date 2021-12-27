@@ -95,8 +95,8 @@
     All known bugs are now corrected.
 
 # AUTHOR
-   De Castro Lucas - 2A - Class 23
-   Da Silva Lucas - 2A - Class 23
+    De Castro Lucas - 2A - Class 23
+    Da Silva Lucas - 2A - Class 23
 
 # COPYRIGHT
     This program is under the MIT Copyright license.
