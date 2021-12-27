@@ -11,6 +11,8 @@
 #define ANSI_COLOR_CYAN "\x1b[36m"
 #define ANSI_COLOR_RESET "\x1b[0m"
 
+extern FILE *log_file;
+
 typedef struct company company;
 typedef struct plane plane;
 typedef struct waiting_queue waiting_queue;

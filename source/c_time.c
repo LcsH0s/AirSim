@@ -4,6 +4,8 @@
 
 #include "c_time.h"
 
+extern FILE *log_file;
+
 void update_time(c_time *l_time, unsigned old_t)
 {
     unsigned new_t = (unsigned)time(NULL);
@@ -67,43 +69,80 @@ void disp_time(c_time time)
 {
 
     if (time.day > 9)
+    {
         printf("%s[system] ► Time is : [%d", "\x1b[34m", time.day);
+        fprintf(log_file, "%s[system] ► Time is : [%d", "\x1b[34m", time.day);
+    }
     else
+    {
         printf("%s[system] ► Time is : [0%d", "\x1b[34m", time.day);
+        fprintf(log_file, "%s[system] ► Time is : [0%d", "\x1b[34m", time.day);
+    }
 
     if (time.month < 10)
+    {
         printf("/0%d", time.month);
+        fprintf(log_file, "/0%d", time.month);
+    }
     else
+    {
         printf("/%d", time.month);
+        fprintf(log_file, "/%d", time.month);
+    }
 
     printf("/%d", time.year);
+    fprintf(log_file, "/%d", time.year);
 
     if (time.hour > 9)
+    {
         printf(" %d", time.hour);
+        fprintf(log_file, " %d", time.hour);
+    }
     else
+    {
         printf(" 0%d", time.hour);
+        fprintf(log_file, " 0%d", time.hour);
+    }
 
     if (time.min > 9)
+    {
         printf(":%d", time.min);
+        fprintf(log_file, ":%d", time.min);
+    }
     else
+    {
         printf(":0%d", time.min);
+        fprintf(log_file, ":0%d", time.min);
+    }
 
     printf(":%d]%s\n", (10 + rand() % 50), "\x1b[0m");
+    fprintf(log_file, ":%d]%s\n", (10 + rand() % 50), "\x1b[0m");
 }
 
 void str_time(c_time time)
 {
     if (time.hour > 9)
+    {
         printf(" %d", time.hour);
+        fprintf(log_file, " %d", time.hour);
+    }
     else
+    {
         printf(" 0%d", time.hour);
-
+        fprintf(log_file, " 0%d", time.hour);
+    }
     if (time.min > 9)
+    {
         printf(":%d", time.min);
+        fprintf(log_file, ":%d", time.min);
+    }
     else
+    {
         printf(":0%d", time.min);
-
+        fprintf(log_file, ":0%d", time.min);
+    }
     printf(":00");
+    fprintf(log_file, ":00");
 }
 
 void delay(unsigned int msecs)
