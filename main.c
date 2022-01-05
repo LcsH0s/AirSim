@@ -10,6 +10,13 @@
 
 #define LOG_FILE_NAME "log/aeroport_log.txt"
 
+void salut()
+{
+    printf("salut\n");
+    printf("je ne suis pas encore dans le monde des mortels\n");
+
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -33,7 +40,6 @@ int main(int argc, char *argv[])
     waiting_queue *landing_queue = malloc(sizeof(waiting_queue));
     company **company_list = make_clist(), **black_list = make_bl();
 
-#pragma region init
 
     printf("%s[system] ► Takeoff queue initializing...%s\n", ANSI_COLOR_BLUE, ANSI_COLOR_RESET);
     fprintf(log_file, "%s[system] ► Takeoff queue initializing...%s\n", ANSI_COLOR_BLUE, ANSI_COLOR_RESET);
@@ -48,8 +54,6 @@ int main(int argc, char *argv[])
     disp_wq(landing_queue);
     printf("\n%s[system] ► Initialization Complete!%s\n", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
     fprintf(log_file, "\n%s[system] ► Initialization Complete!%s\n", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-
-#pragma endregion init
 
     while (1)
     {
