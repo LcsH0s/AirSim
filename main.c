@@ -10,13 +10,6 @@
 
 #define LOG_FILE_NAME "log/aeroport_log.txt"
 
-void salut()
-{
-    printf("salut\n");
-    printf("je ne suis pas encore dans le monde des mortels\n");
-
-}
-
 int main(int argc, char *argv[])
 {
 
