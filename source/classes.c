@@ -8,7 +8,7 @@
 
 FILE *log_file;
 
-plane *p_init(float fuel_level, unsigned number, company *comp, c_time *arrival)
+plane *p_init(float fuel_level, unsigned number, company *comp, c_time *arrival) // Initalize plane structures
 {
     plane *p = malloc(sizeof(plane *));
     *p = (plane){.fuel = fuel_level, .number = number, .comp = comp, .arrival = malloc(sizeof(c_time))};
@@ -20,21 +20,21 @@ plane *p_init(float fuel_level, unsigned number, company *comp, c_time *arrival)
     return p;
 }
 
-company *c_init(char *name, char *acronym)
+company *c_init(char *name, char *acronym) // Initialize company structures
 {
     company *c = malloc(sizeof(company));
     *c = (company){.name = strdup(name), .acronym = strdup(acronym)};
     return c;
 }
 
-waiting_queue *seek_head(waiting_queue *wq)
+waiting_queue *seek_head(waiting_queue *wq) // returns the first element (head) of the waiting queue passed as arguement
 {
     while (wq->prev != NULL)
         wq = wq->prev;
     return wq;
 }
 
-company **make_clist()
+company **make_clist() // creates the list of the companies
 {
     company **company_list = malloc(sizeof(company *) * 4);
     company_list[0] = c_init(("Luftansa"), "LUF");
@@ -44,7 +44,7 @@ company **make_clist()
     return company_list;
 }
 
-company **make_bl()
+company **make_bl() // created list of blacklisted companies
 {
     company **black_list = malloc(sizeof(company *) * 4);
     black_list[0] = NULL;
@@ -54,7 +54,7 @@ company **make_bl()
     return black_list;
 }
 
-company *get_company_by_acronym(char *acronym)
+company *get_company_by_acronym(char *acronym) // returns pointer to company with corresponding acronym. To minimize errors, any unknown acronym will return the first company of the company list
 {
     company **clist = make_clist();
     for (int i = 0; i < 4; i++)
@@ -65,7 +65,7 @@ company *get_company_by_acronym(char *acronym)
     return clist[0];
 }
 
-void p_info(waiting_queue *wq)
+void p_info(waiting_queue *wq) // displays all info available of the plane
 {
     printf("%s[info] ► Information on plane N°%d : ", ANSI_COLOR_CYAN, wq->avion->number);
     fprintf(log_file, "%s[info] ► Information on plane N°%d : ", ANSI_COLOR_CYAN, wq->avion->number);
@@ -77,7 +77,7 @@ void p_info(waiting_queue *wq)
     fprintf(log_file, "%s\n", ANSI_COLOR_RESET);
 }
 
-void info_all(waiting_queue *wq)
+void info_all(waiting_queue *wq) // displays info of all planes in waiting queues
 {
     if (wq->avion == NULL)
     {
@@ -94,7 +94,7 @@ void info_all(waiting_queue *wq)
     p_info(wq);
 }
 
-void wq_add(waiting_queue *wq, plane *p)
+void wq_add(waiting_queue *wq, plane *p) // add plane to waiting queue
 {
     waiting_queue *current = seek_head(wq);
     wq = seek_head(wq);
@@ -114,7 +114,7 @@ void wq_add(waiting_queue *wq, plane *p)
     current->next->prev = current;
 }
 
-void disp_wq(waiting_queue *wq)
+void disp_wq(waiting_queue *wq) // display planes in waiting queue
 {
     wq = seek_head(wq);
     if (wq->avion == NULL)
@@ -133,7 +133,7 @@ void disp_wq(waiting_queue *wq)
     fprintf(log_file, "%s[info] ► Flight number : %d%s\n", ANSI_COLOR_CYAN, wq->avion->number, ANSI_COLOR_RESET);
 }
 
-void tk_init(waiting_queue *wq)
+void tk_init(waiting_queue *wq) // initializes the takeoff queue
 {
     FILE *f = fopen("events/init_planes_tk.event", "r");
     unsigned fsize, number;
@@ -161,7 +161,7 @@ void tk_init(waiting_queue *wq)
     }
 }
 
-void ld_init(waiting_queue *wq)
+void ld_init(waiting_queue *wq) // initialize landing queue
 {
     FILE *f = fopen("events/init_planes_ld.event", "r");
     unsigned fsize, number;
@@ -188,7 +188,7 @@ void ld_init(waiting_queue *wq)
     }
 }
 
-void cmd_add(waiting_queue *wq)
+void cmd_add(waiting_queue *wq) // command to add plane to waiting queue
 {
     unsigned number;
     float fuel;
@@ -224,7 +224,7 @@ void cmd_add(waiting_queue *wq)
     wq_add(wq, p_init(fuel, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year}));
 }
 
-void cmd_add_rand_fuel(waiting_queue *wq)
+void cmd_add_rand_fuel(waiting_queue *wq) // command to add plane to waiting queue with random fuel level
 {
     unsigned number;
     char acronym[10];
@@ -256,7 +256,7 @@ void cmd_add_rand_fuel(waiting_queue *wq)
     wq_add(wq, p_init(10 + rand() % 90, number, get_company_by_acronym(acronym), &(c_time){.min = min % 60, .day = day % 31, .hour = hour % 24, .month = month % 12, .year = year}));
 }
 
-waiting_queue *find_plane_by_number(waiting_queue *wq, unsigned number)
+waiting_queue *find_plane_by_number(waiting_queue *wq, unsigned number) // return plane using plane number
 {
     while (wq->next != NULL)
     {
@@ -269,7 +269,7 @@ waiting_queue *find_plane_by_number(waiting_queue *wq, unsigned number)
     return NULL;
 }
 
-waiting_queue *find_plane_by_index(waiting_queue *wq, unsigned index)
+waiting_queue *find_plane_by_index(waiting_queue *wq, unsigned index) // return plane pointer with index
 {
     for (int i = 0; i < index; i++)
     {
@@ -284,7 +284,7 @@ waiting_queue *find_plane_by_index(waiting_queue *wq, unsigned index)
     return wq;
 }
 
-void wq_del(waiting_queue *wq)
+void wq_del(waiting_queue *wq) // delete waiting queue element
 {
     waiting_queue *current = wq;
     if ((current->prev == NULL) & (current->next == NULL))
@@ -318,7 +318,7 @@ void wq_del(waiting_queue *wq)
     }
 }
 
-void land(waiting_queue *wq)
+void land(waiting_queue *wq) // deletes plane from landing queue as landing
 {
     printf("%s[system] ► Due to meteorological circumstances, plane N°%d will land as soon as the landing strip is clear.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, ANSI_COLOR_RESET);
     fprintf(log_file, "%s[system] ► Due to meteorological circumstances, plane N°%d will land as soon as the landing strip is clear.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, ANSI_COLOR_RESET);
@@ -327,7 +327,7 @@ void land(waiting_queue *wq)
     wq_del(wq);
 }
 
-void force_land(waiting_queue *wq)
+void force_land(waiting_queue *wq) // forces plane to land in priority
 {
     printf("%s[system] ► Due to an emergency, the plane N°%d has now priority to land\n[system] ► All other planes will be consequently delayed.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, ANSI_COLOR_RESET);
     fprintf(log_file, "%s[system] ► Due to an emergency, the plane N°%d has now priority to land\n[system] ► All other planes will be consequently delayed.%s\n", ANSI_COLOR_YELLOW, wq->avion->number, ANSI_COLOR_RESET);
@@ -336,7 +336,7 @@ void force_land(waiting_queue *wq)
     wq_del(wq);
 }
 
-int is_comp_in_bl(company *c, company **bl)
+int is_comp_in_bl(company *c, company **bl) // returns 1 if company is in blacklist, 0 if not
 {
     for (int i = 0; i < 4; i++)
     {
@@ -349,7 +349,7 @@ int is_comp_in_bl(company *c, company **bl)
     return 0;
 }
 
-void tk_update(waiting_queue *wq, c_time local_time, company **bl)
+void tk_update(waiting_queue *wq, c_time local_time, company **bl) // updates takeoff queue
 {
     if (wq->avion == NULL)
         return;
@@ -392,7 +392,7 @@ void tk_update(waiting_queue *wq, c_time local_time, company **bl)
     }
 }
 
-void ld_update(waiting_queue *wq, c_time local_time, company **bl)
+void ld_update(waiting_queue *wq, c_time local_time, company **bl) // updates landing queue
 {
     if (wq->avion == NULL)
         return;
@@ -433,7 +433,7 @@ void ld_update(waiting_queue *wq, c_time local_time, company **bl)
         ld_update(wq->next, local_time, bl);
 }
 
-void blacklist_add(company **bl, company *c)
+void blacklist_add(company **bl, company *c) // add comany to blacklist
 {
     if (is_comp_in_bl(c, bl))
     {
@@ -454,7 +454,7 @@ void blacklist_add(company **bl, company *c)
     }
 }
 
-void blacklist_remove(company **bl, company *c)
+void blacklist_remove(company **bl, company *c) // remove company from blacklist
 {
     if (!is_comp_in_bl(c, bl))
     {
@@ -475,7 +475,7 @@ void blacklist_remove(company **bl, company *c)
     }
 }
 
-void disp_bl(company **bl)
+void disp_bl(company **bl) // display blacklist
 {
     for (int i = 0; i < 4; i++)
     {
@@ -494,7 +494,7 @@ void disp_bl(company **bl)
     fprintf(log_file, "%s[info] ► No company is blacklisted.%s\n", ANSI_COLOR_CYAN, ANSI_COLOR_RESET);
 }
 
-void disp_clist(company **clist)
+void disp_clist(company **clist) // display company list
 {
     printf("%s[info] ► Company list:%s\n", ANSI_COLOR_CYAN, ANSI_COLOR_RESET);
     fprintf(log_file, "%s[info] ► Company list:%s\n", ANSI_COLOR_CYAN, ANSI_COLOR_RESET);
@@ -505,7 +505,7 @@ void disp_clist(company **clist)
     }
 }
 
-void disp_cc(company *c, waiting_queue *tk, waiting_queue *ld)
+void disp_cc(company *c, waiting_queue *tk, waiting_queue *ld) // display company full characteristics
 {
     printf("%s[info] ► Company caracteristics:%s\n", ANSI_COLOR_CYAN, ANSI_COLOR_RESET);
     fprintf(log_file, "%s[info] ► Company caracteristics:%s\n", ANSI_COLOR_CYAN, ANSI_COLOR_RESET);
