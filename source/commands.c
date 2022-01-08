@@ -4,12 +4,14 @@
 
 #include "commands.h"
 
-char *get_command()
+char *get_command() // get pointer to command string. Normalizing input is a good practice and to ensure normalization, this command will be used for any input taken from the user
 {
     char *command = malloc(sizeof(char) * 100);
     scanf(" %s", command);
     return command;
 }
+
+// Command list in order to increase code readability in main function and reduce error occurences. Also includes aliases for commands
 
 int is_exit(const char *command)
 {
