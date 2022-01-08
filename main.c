@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     char *curr_cmd;
     char *curr_arg;
     log_file = fopen("log/aeroport_log.txt", "a+");
-    if (log_file == NULL)
+    if (log_file == NULL) // Initializing log file pointer and raising error if not able to open log file located in 'log/aeroport_log.txt'
     {
         printf("%s[error] ► Impossible to open log file.%s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
         fprintf(log_file, "%s[error] ► Impossible to open log file.%s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    // Variables initialization
     c_time local_time = {0, 6, 1, 1, 2021};
     unsigned old_t = (unsigned)time(NULL);
 
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
     waiting_queue *landing_queue = malloc(sizeof(waiting_queue));
     company **company_list = make_clist(), **black_list = make_bl();
 
-
+    // Scenario planes initialization
     printf("%s[system] ► Takeoff queue initializing...%s\n", ANSI_COLOR_BLUE, ANSI_COLOR_RESET);
     fprintf(log_file, "%s[system] ► Takeoff queue initializing...%s\n", ANSI_COLOR_BLUE, ANSI_COLOR_RESET);
 
@@ -48,17 +49,19 @@ int main(int argc, char *argv[])
     printf("\n%s[system] ► Initialization Complete!%s\n", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
     fprintf(log_file, "\n%s[system] ► Initialization Complete!%s\n", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
 
-    while (1)
+    while (1) // Main simulator loop
     {
-        update_time(&local_time, old_t);
+        update_time(&local_time, old_t); // Updating local_time variable every time the loop is executed
         old_t = (unsigned)time(NULL);
-        tk_update(takeoff_queue, local_time, black_list);
+        tk_update(takeoff_queue, local_time, black_list); // Updating the takeoff and landing queue
         ld_update(landing_queue, local_time, black_list);
         disp_time(local_time);
 
         printf("[admin] ► ");
         curr_cmd = get_command();
         fprintf(log_file, "[admin] ► %s\n", curr_cmd);
+        
+        // determining the current command entered by the user
         if (is_exit(curr_cmd))
         {
             break;
@@ -263,13 +266,13 @@ int main(int argc, char *argv[])
                 blacklist_remove(black_list, get_company_by_acronym(curr_arg));
             }
         }
-        else
+        else // if the command doesn't correspond to any defined command, displays help and finishes the loop
         {
             printf("%s[error] ► Unknown command. To see available commands, open manual with command 'man'%s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
             fprintf(log_file, "%s[error] ► Unknown command. To see available commands, open manual with command 'man'%s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
         }
     }
-
+    // Cleanup after exiting the loop
     fclose(log_file);
     printf("\x1b[34m[system] ► <Session Terminated>\x1b[0m\n");
     fprintf(log_file, "\x1b[34m[system] ► <Session Terminated>\x1b[0m\n");
