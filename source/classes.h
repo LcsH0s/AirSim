@@ -3,6 +3,8 @@
 
 #include "c_time.h"
 
+// colors for terminal
+
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
 #define ANSI_COLOR_YELLOW "\x1b[33m"
@@ -13,18 +15,21 @@
 
 extern FILE *log_file;
 
+// typedef of all used structures
 typedef struct company company;
 typedef struct plane plane;
 typedef struct waiting_queue waiting_queue;
 typedef struct event_queue event_queue;
 typedef struct black_list black_list;
 
+// compnay structure
 struct company
 {
     char *name;
     char *acronym;
 };
 
+// plane stucture
 struct plane
 {
     float fuel;
@@ -33,6 +38,7 @@ struct plane
     c_time *arrival;
 };
 
+// waiting queue linked list
 struct waiting_queue
 {
     plane *avion;
@@ -40,6 +46,7 @@ struct waiting_queue
     waiting_queue *prev;
 };
 
+// event queue linked list
 struct event_queue
 {
     char *event;
