@@ -4,9 +4,14 @@
 
 #include "c_time.h"
 
+/*
+    This file contains the c_time class. It's a custom class created to implement a time system and time objects that can be integrated in the loop as the current time
+    but also in the plane structure as the arrival/departure date&time
+*/
+
 extern FILE *log_file;
 
-void update_time(c_time *l_time, unsigned old_t)
+void update_time(c_time *l_time, unsigned old_t) // Updates the time using the current time and the time elapsed since the last loop execution passed as the old_t variable
 {
     unsigned new_t = (unsigned)time(NULL);
     unsigned delta = new_t - old_t;
@@ -36,7 +41,8 @@ void update_time(c_time *l_time, unsigned old_t)
         }
     }
 }
-void increment_time(c_time *l_time, unsigned add)
+
+void increment_time(c_time *l_time, unsigned add) // Increment c_time variable by add minutes
 {
 
     for (int i = 0; i < add; i++)
@@ -65,7 +71,7 @@ void increment_time(c_time *l_time, unsigned add)
     }
 }
 
-void disp_time(c_time time)
+void disp_time(c_time time) // Displays 'time' 
 {
 
     if (time.day > 9)
@@ -119,7 +125,7 @@ void disp_time(c_time time)
     fprintf(log_file, ":%d]%s\n", (10 + rand() % 50), "\x1b[0m");
 }
 
-void str_time(c_time time)
+void str_time(c_time time) // Displays 'time' as a formated string
 {
     if (time.hour > 9)
     {
@@ -145,14 +151,14 @@ void str_time(c_time time)
     fprintf(log_file, ":00");
 }
 
-void delay(unsigned int msecs)
+void delay(unsigned int msecs) // sleep of the THREAD of a specified number in ms. Has the same behaviour as the python sleep() command (exectution is suspended but not stacked until end of sleep as opposed to usleep() command from std C libraries)
 {
     clock_t goal = msecs * CLOCKS_PER_SEC / 1000 + clock(); // convert msecs to clock count
     while (goal > clock())
         ;
 }
 
-int time_cmp(c_time a, c_time b)
+int time_cmp(c_time a, c_time b) // return 1 if a is greated than b, else returns 0
 {
     if (a.year > b.year)
     {
